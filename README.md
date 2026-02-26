@@ -15,3 +15,6 @@ Mã lớp: 26D1INF50902802 – Học kỳ đầu năm 2026
 
 ## Supervisor
 - Nguyễn Mạnh Tuấn
+
+## Link to results
+https://drive.google.com/drive/folders/1l0UZ_qPKevlM7M1z5rxu4l4g32uhepGm
