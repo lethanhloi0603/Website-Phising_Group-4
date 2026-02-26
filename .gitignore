@@ -1,0 +1,35 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# ======================
+# Data (KHÔNG push dataset)
+# ======================
+*.csv
+*.xlsx
+*.json
+
+# ======================
+# Models / outputs
+# ======================
+*.joblib
+*.pkl
+*.h5
+*.png
+
+# ======================
+# IDE
+# ======================
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
