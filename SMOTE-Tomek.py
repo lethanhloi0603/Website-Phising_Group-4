@@ -1,106 +1,85 @@
-# ============================================================
-# 3.2.2 Class Distribution & Imbalance Handling using SMOTE-Tomek
-# ============================================================
-
-
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-
-
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler
 from imblearn.combine import SMOTETomek
+import os
 
+# =====================================================
+# 1. Load dữ liệu train trước khi cân bằng
+# =====================================================
+X_train = pd.read_csv("train_test_exports/X_train_processed.csv")
+y_train = pd.read_csv("train_test_exports/y_train.csv")["phishing"]
 
-# ------------------------------------------------
-# 1. Load dataset
-# ------------------------------------------------
-DATA_PATH = "dataset_full.csv"
-TARGET_COL = "phishing"   # target của bạn
+print("===== CLASS DISTRIBUTION BEFORE BALANCING =====")
+print(y_train.value_counts())
 
+# =====================================================
+# 2. Áp dụng SMOTE-Tomek
+# =====================================================
+sm = SMOTETomek(random_state=42)
+X_sm, y_sm = sm.fit_resample(X_train, y_train)
 
-df = pd.read_csv(DATA_PATH)
+print("\n===== CLASS DISTRIBUTION AFTER SMOTE-TOMEK =====")
+print(pd.Series(y_sm).value_counts())
 
+# =====================================================
+# 3. Tạo bảng so sánh trước và sau cân bằng
+# =====================================================
+before_counts = y_train.value_counts().sort_index()
+after_counts = pd.Series(y_sm).value_counts().sort_index()
 
-if TARGET_COL not in df.columns:
-   raise ValueError(f"Không tìm thấy cột '{TARGET_COL}'")
+summary = pd.DataFrame({
+    "Before_SMOTE": before_counts,
+    "After_SMOTE_Tomek": after_counts
+})
 
+summary["Change"] = summary["After_SMOTE_Tomek"] - summary["Before_SMOTE"]
 
-X = df.drop(columns=[TARGET_COL])
-y = df[TARGET_COL]
+print("\n===== COMPARISON TABLE =====")
+print(summary)
 
+# =====================================================
+# 4. Tạo thư mục output nếu chưa tồn tại
+# =====================================================
+output_dir = "train_test_exports"
+os.makedirs(output_dir, exist_ok=True)
 
-# ------------------------------------------------
-# 2. Phân bố lớp ban đầu
-# ------------------------------------------------
-print("\n=== Class distribution BEFORE balancing ===")
-class_counts = y.value_counts().sort_index()
-print(class_counts)
+# =====================================================
+# 5. Lưu bảng so sánh
+# =====================================================
+summary.to_csv(
+    f"{output_dir}/balance_comparison.csv",
+    encoding="utf-8-sig"
+)
 
+# =====================================================
+# 6. Lưu dữ liệu sau SMOTE
+# =====================================================
+X_sm_df = pd.DataFrame(X_sm, columns=X_train.columns)
+y_sm_df = pd.DataFrame({"phishing": y_sm})
 
-plt.figure(figsize=(6,4))
-plt.bar(["Legitimate (0)", "Phishing (1)"],
-       class_counts.values,
-       color=["#1f77b4", "#d62728"])
-plt.title("Class Distribution Before SMOTE-Tomek")
-plt.ylabel("Samples")
-plt.tight_layout()
-plt.show()
+X_sm_df.to_csv(
+    f"{output_dir}/X_train_smote_tomek.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
 
+y_sm_df.to_csv(
+    f"{output_dir}/y_train_smote_tomek.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
 
-# ------------------------------------------------
-# 3. Tiền xử lý toàn bộ dữ liệu
-# (SMOTE cần dữ liệu numeric + không missing)
-# ------------------------------------------------
-imputer = SimpleImputer(strategy="median")
-scaler = StandardScaler()
+# train full
+train_sm_df = X_sm_df.copy()
+train_sm_df["phishing"] = y_sm
 
+train_sm_df.to_csv(
+    f"{output_dir}/train_smote_tomek_full.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
 
-X_imputed = imputer.fit_transform(X)
-X_scaled = scaler.fit_transform(X_imputed)
-
-
-# ------------------------------------------------
-# 4. Áp dụng SMOTE-Tomek
-# ------------------------------------------------
-print("\nApplying SMOTE-Tomek...")
-
-
-smt = SMOTETomek(random_state=42)
-X_balanced, y_balanced = smt.fit_resample(X_scaled, y)
-
-
-# ------------------------------------------------
-# 5. Phân bố lớp sau cân bằng
-# ------------------------------------------------
-print("\n=== Class distribution AFTER SMOTE-Tomek ===")
-after_counts = pd.Series(y_balanced).value_counts().sort_index()
-print(after_counts)
-
-
-plt.figure(figsize=(6,4))
-plt.bar(["Legitimate (0)", "Phishing (1)"],
-       after_counts.values,
-       color=["#1f77b4", "#d62728"])
-plt.title("Class Distribution After SMOTE-Tomek")
-plt.ylabel("Samples")
-plt.tight_layout()
-plt.show()
-
-
-# ------------------------------------------------
-# 6. Tạo dataset mới đã cân bằng
-# ------------------------------------------------
-X_balanced_df = pd.DataFrame(X_balanced, columns=X.columns)
-df_balanced = X_balanced_df.copy()
-df_balanced[TARGET_COL] = y_balanced
-
-
-OUTPUT_PATH = "dataset_balanced_smotetomek.csv"
-df_balanced.to_csv(OUTPUT_PATH, index=False)
-
-
-print(f"\n Dataset balanced saved to: {OUTPUT_PATH}")
-print("New dataset shape:", df_balanced.shape)
-
+print("\n===== FILES SAVED =====")
+print("balance_comparison.csv")
+print("X_train_smote_tomek.csv")
+print("y_train_smote_tomek.csv")
+print("train_smote_tomek_full.csv")
