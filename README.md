@@ -18,7 +18,7 @@ Mã lớp học phần: 26D1INF50902802 – Học kỳ đầu năm 2026
 - Nguyễn Mạnh Tuấn
 
 ## Link to raw dataset
-https://github.com/GregaVrbancic/Phishing-Dataset?tab=readme-ov-file
+https://github.com/GregaVrbancic/Phishing-Dataset?tab=readme-ov-file.
 Source: Vrbančič, G., Fister Jr, I., & Podgorelec, V. (2020). Datasets for phishing websites detection. Data in Brief, 33, 106438. 
 
 ## Link to results
