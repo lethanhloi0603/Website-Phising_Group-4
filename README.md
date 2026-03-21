@@ -2,7 +2,7 @@
 This is the final project for the Information Security in E-Commerce course.
 Class code: 26D1INF50902802 – First semester of 2026.
 
-Đây là dự án cuối kỳ môn Bảo mật Thông tin trong Thư mục ơng mại Điện tử 
+Đây là dự án cuối kỳ môn Bảo mật Thông tin trong Thư mục ơng mại Điện tử. 
 Mã lớp học phần: 26D1INF50902802 – Học kỳ đầu năm 2026
 
 ## Authors
